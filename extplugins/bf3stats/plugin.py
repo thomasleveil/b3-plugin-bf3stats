@@ -21,6 +21,9 @@ from b3.plugin import  Plugin
 from b3.functions import minutesStr
 from bf3stats.playerstats import PlayerStats, Bf3statsError, NoStat
 
+from bf3stats import __version__ as plugin_version
+__version__ = plugin_version # hack to get the plugin version correctly reported to B3 master servers
+
 
 class Bf3StatsPlugin(Plugin):
 
