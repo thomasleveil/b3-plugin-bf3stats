@@ -5,11 +5,13 @@ BF3stats plugin for Big Brother Bot (www.bigbrotherbot.net)
 Description
 -----------
 
-This plugin provides a commands which can query the bf3stats.com website for stats about players.
+This plugin provides a commands which can query the `bf3stats.com <http://bf3stats.com>`_ website for stats about players.
 
 .. image:: http://i.imgur.com/XcvyI.png
    :alt: In-game screenshot
    :target: http://imgur.com/XcvyI
+   :align: center
+
 
 Requirements
 ------------
@@ -49,8 +51,15 @@ Support is only provided on www.bigbrotherbot.net forums on the following topic 
 Credit
 ------
 
-This plugin has been make possible thanks to `Ozon's work <https://github.com/ozon/python-bf3stats>`_
+This plugin has been make possible thanks to :
 
+- `Ozon's work <https://github.com/ozon/python-bf3stats>`_
+- `P-STATS.com <http://p-stats.com/>`_
+
+.. image:: http://files.p-stats.com/img/pstats/pstats_logo.png
+     :alt: Player Stats Network
+     :target: http://p-stats.com/
+     :scale: 50%
 
 Contrib
 -------
