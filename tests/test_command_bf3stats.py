@@ -111,18 +111,18 @@ bf3stats: 0
 
     @patch("urllib.urlopen", new=urlopen_not_found_mock)
     def test_not_found(self):
-        self.joe.connects('joe')
+        self.joe.connects('Joe')
         self.joe.says("!bf3stats")
-        self.assertEqual(["Error while querying bf3stats.com. Player 'joe' not found"], self.joe.message_history)
+        self.assertEqual(["Error while querying bf3stats.com. Player 'Joe' not found"], self.joe.message_history)
 
     @patch("urllib.urlopen", new=urlopen_invalid_name_mock)
     def test_invalid_name(self):
-        self.joe.connects('joe')
+        self.joe.connects('Joe')
         self.joe.says("!bf3stats")
-        self.assertEqual(["Error while querying bf3stats.com. Error while querying 'joe' : invalid_name"], self.joe.message_history)
+        self.assertEqual(["Error while querying bf3stats.com. Error while querying 'Joe' : invalid_name"], self.joe.message_history)
 
     @patch("urllib.urlopen", new=urlopen_pifound_mock)
     def test_pifound(self):
-        self.joe.connects('joe')
+        self.joe.connects('Joe')
         self.joe.says("!bf3stats")
-        self.assertEqual(['bf3stats.com has no stats for joe'], self.joe.message_history)
+        self.assertEqual(['bf3stats.com has no stats for Joe'], self.joe.message_history)

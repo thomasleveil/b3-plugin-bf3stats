@@ -7,6 +7,9 @@ Description
 
 This plugin provides a commands which can query the bf3stats.com website for stats about players.
 
+.. image:: http://i.imgur.com/XcvyI.png
+   :alt: In-game screenshot
+   :target: http://imgur.com/XcvyI
 
 Requirements
 ------------
