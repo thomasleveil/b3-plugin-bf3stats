@@ -193,8 +193,8 @@ class Bf3StatsPlugin(Plugin):
         if cmd.loud or cmd.big:
             self.console.say("bf3stats.com for %s : (upd %s ago)" % (targetted_player.name,  short_minuteStr("%ss" % stats.data_age)))
             self.console.say(str(stats))
-        if cmd.big:
-            self.console.write(('admin.yell', "bf3stats.com for %s : %s" % (targetted_player.name, stats), 10, 'all'))
+            if cmd.big:
+                self.console.write(('admin.yell', "bf3stats.com for %s : %s" % (targetted_player.name, stats), 10, 'all'))
         else:
             self.console.say("bf3stats.com for %s : (upd %s ago)" % (targetted_player.name,  short_minuteStr("%ss" % stats.data_age)))
             self.console.say(str(stats))
