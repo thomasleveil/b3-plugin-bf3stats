@@ -86,3 +86,7 @@ Changelog
 
 1.1
   can now request stats update on bf3stats.com given that you registered your app
+
+1.1.1
+  - Do not duplicate requests for a same player made multiple times waiting for the update result
+  - Cosmetic changes to the way results are displayed
