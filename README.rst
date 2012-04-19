@@ -5,7 +5,12 @@ BF3stats plugin for Big Brother Bot (www.bigbrotherbot.net)
 Description
 -----------
 
-This plugin provides a commands which can query the `bf3stats.com <http://bf3stats.com>`_ website for stats about players.
+This plugin provides a command which can query the `bf3stats.com <http://bf3stats.com>`_ website for stats about players.
+
+Bf3stats.com service does only refresh players stats on request, either by searching a player on the `bf3stats.com <http://bf3stats.com>`_ website or using a `registered app key <http://bf3stats.com/site/api/apps>`_.
+
+If you go on `http://bf3stats.com/site/api/apps <http://bf3stats.com/site/api/apps>`_ and register your plugin in the *Register App* form, then you will be given a *ident*/*secret_key* pair that you can set in this plugin config file. This will allow the plugin to request updates for you.
+
 
 .. image:: http://i.imgur.com/XcvyI.png
    :alt: In-game screenshot
@@ -72,3 +77,12 @@ Contrib
    :alt: Build Status
    :target: http://travis-ci.org/courgette/b3-plugin-bf3stats
 
+
+Changelog
+---------
+
+1.0
+  first release which can query players' stats from bf3stats.com
+
+1.1
+  can now request stats update on bf3stats.com given that you registered your app

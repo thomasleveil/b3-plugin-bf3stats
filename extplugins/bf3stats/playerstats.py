@@ -26,8 +26,8 @@ class Error(Bf3statsError):
 
 class PlayerStats(object):
 
-    def __init__(self, playername):
-        bf3stats_service = API()
+    def __init__(self, bf3stats_api, playername):
+        bf3stats_service = bf3stats_api
         data = bf3stats_service.player(playername, 'clear,global,scores,rank')
         if not data:
             raise Bf3statsError("no data received from bf3stats.com", None)

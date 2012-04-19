@@ -1,11 +1,11 @@
 import sys
-from mock import patch
 
 if sys.version_info[:2] < (2, 7):
     import unittest2 as unittest
 else:
     import unittest
 import logging
+from mock import patch
 from b3 import TEAM_UNKNOWN
 from b3.config import XmlConfigParser
 from b3.fake import FakeClient

@@ -16,21 +16,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
+import ConfigParser
 import time
 from b3.plugin import  Plugin
 from b3.functions import minutesStr
+from bf3stats.api import API
 from bf3stats.playerstats import PlayerStats, Bf3statsError, NoStat
 
 from bf3stats import __version__ as plugin_version
+from bf3stats.utils import Bf3stats_player_update
+
 __version__ = plugin_version # hack to get the plugin version correctly reported to B3 master servers
 
 
 class Bf3StatsPlugin(Plugin):
-
     def __init__(self, console, config=None):
+        self.ident = None
+        self.secret_key = None
+        self.age_triggering_player_update = 60*60*24*7
         Plugin.__init__(self, console, config)
 
-    ################################################################################################################
+################################################################################################################
     #
     #    Plugin interface implementation
     #
@@ -41,7 +47,8 @@ class Bf3StatsPlugin(Plugin):
         This is called after loadConfig(). Any plugin private variables loaded
         from the config need to be reset here.
         """
-        pass
+        self._load_config_bf3stats()
+        self._load_config_preferences()
 
 
     def onStartup(self):
@@ -64,7 +71,6 @@ class Bf3StatsPlugin(Plugin):
         pass
 
 
-
     ################################################################################################################
     #
     #   Commands implementations
@@ -84,21 +90,11 @@ class Bf3StatsPlugin(Plugin):
                 return
         if not targetted_player:
             targetted_player = client
-        try:
-            stats = self.get_updated_stats(targetted_player)
-        except NoStat:
-            client.message("bf3stats.com has no stats for %s" % targetted_player.cid)
-        except Bf3statsError, err:
-            client.message("Error while querying bf3stats.com. %s" % err)
+
+        if self.ident and self.secret_key and client.maxLevel >= self.minimum_level_to_update_stats:
+            self.do_cmd_bf3stats_with_update(client, targetted_player, cmd)
         else:
-            text = "%s | updated %s ago" % (stats, minutesStr("%ss" % stats.data_age))
-            if cmd.loud:
-                self.console.say("bf3stats.com for %s : %s" % (targetted_player.cid, text))
-            elif cmd.big:
-                self.console.write(('admin.yell', "bf3stats.com for %s : %s" % (targetted_player.cid, text), 10, 'all'))
-            else:
-                self.console.write(('admin.say', text, 'player', client.cid))
-                self.console.write(('admin.yell', text, 10, 'player', client.cid))
+            self.do_cmd_bf3stats_without_update(client, targetted_player, cmd)
 
 
     ################################################################################################################
@@ -106,7 +102,6 @@ class Bf3StatsPlugin(Plugin):
     #    Other methods
     #
     ################################################################################################################
-
 
     def _registerCommands(self):
         if 'commands' in self.config.sections():
@@ -123,11 +118,112 @@ class Bf3StatsPlugin(Plugin):
                     self.warning("config defines unknown command '%s'" % cmd)
 
     def get_updated_stats(self, player):
+        assert hasattr(player, "name")
         CACHE_TTL_SECONDS = 60 * 5
         bf3stats_var = player.var(self, "bf3stats", None)
         if not bf3stats_var or bf3stats_var.value is None or time.time() - bf3stats_var.value.date_update > CACHE_TTL_SECONDS:
-            bf3stats = PlayerStats(player.name)
+            bf3stats = PlayerStats(self.bf3stats_api, player.name)
             self.debug(repr(bf3stats.data))
             bf3stats_var = player.setvar(self, "bf3stats", bf3stats)
         return bf3stats_var.value
 
+    def _load_config_bf3stats(self):
+        try:
+            ident = self.config.get("bf3stats.com", "ident")
+        except ConfigParser.NoOptionError, err:
+            ident = None
+        try:
+            secret_key = self.config.get("bf3stats.com", "secret_key")
+        except ConfigParser.NoOptionError, err:
+            secret_key = None
+        if ident and secret_key:
+            self.info(
+                "bf3stats.com ident/secret_key pair found in config. Player stats updates will be requested if too old")
+            self.ident = ident
+            self.secret_key = secret_key
+        elif ident is None and secret_key is None:
+            self.info("No bf3stats.com ident/secret_key pair found in config. Player stats updates won't be requested")
+        elif ident or secret_key:
+            self.warning(
+                "No bf3stats.com ident/secret_key pair found in config. Player stats updates won't be requested")
+        self.bf3stats_api = API(ident=self.ident, secret=self.secret_key)
+
+    def _load_config_preferences(self):
+        self.minimum_level_to_update_stats = 128 # by default only superadmin can request updates
+        try:
+            data = self.config.getint("preferences", "minimum_level_to_update_stats")
+            if not 0 <= data <= 128:
+                raise ValueError("preferences\minimum_level_to_update_stats must be between 0 and 128")
+        except ConfigParser.NoOptionError, err:
+            self.debug(err)
+            self.warning(
+                "setting preferences\minimum_level_to_update_stats not found in config. Falling back on default value")
+        except ValueError, err:
+            self.debug(err)
+            self.warning(
+                "Invalid value for setting preferences\minimum_level_to_update_stats. Falling back on default value. %s" % err)
+        except Exception, err:
+            self.error(err)
+        else:
+            self.minimum_level_to_update_stats = data
+        finally:
+            self.info(
+                "setting preferences\minimum_level_to_update_stats is : " + str(self.minimum_level_to_update_stats))
+
+
+    def callback_player_update(self, client, targetted_player, cmd, data):
+        if data.status == "notask":
+            # no credit left to request update
+            client.message("Bf3stats.com hourly limit reached. Can't update stats until next hour")
+        elif hasattr(data, "Task") and data.Task.state == "finished":
+            self.do_cmd_bf3stats_without_update(client, targetted_player, cmd)
+        else:
+            self.debug(data)
+            err = data.status
+            if data.status == 'error':
+                err = data.error
+            client.message("Bf3stats.com failed to update stats for '%s' (%s)" % (targetted_player.name, err))
+
+    def do_cmd_bf3stats_without_update(self, client, targetted_player, cmd):
+        try:
+            stats = self.get_updated_stats(targetted_player)
+        except NoStat:
+            client.message("bf3stats.com has no stats for %s" % targetted_player.cid)
+        except Bf3statsError, err:
+            client.message("Error while querying bf3stats.com. %s" % err)
+        else:
+            text = "%s | updated %s ago" % (stats, minutesStr("%ss" % stats.data_age))
+            if cmd.loud:
+                self.console.say("bf3stats.com for %s : %s" % (targetted_player.cid, text))
+            elif cmd.big:
+                self.console.write(('admin.yell', "bf3stats.com for %s : %s" % (targetted_player.cid, text), 10, 'all'))
+            else:
+                self.console.write(('admin.say', text, 'player', client.cid))
+                self.console.write(('admin.yell', text, 10, 'player', client.cid))
+
+    def do_cmd_bf3stats_with_update(self, client, targetted_player, cmd):
+        try:
+            stats = self.get_updated_stats(targetted_player)
+        except NoStat:
+            client.message("bf3stats.com has no stats for %s, requesting update..." % targetted_player.name)
+            t = Bf3stats_player_update(bf3stats_api=self.bf3stats_api, player_name=targetted_player.name,
+                callback=self.callback_player_update,
+                callback_kwargs={'client': client, 'targetted_player': targetted_player, 'cmd': cmd})
+            t.start()
+        except Bf3statsError, err:
+            client.message("Error while querying bf3stats.com. %s" % err)
+        else:
+            text = "%s | updated %s ago" % (stats, minutesStr("%ss" % stats.data_age))
+            if cmd.loud:
+                self.console.say("bf3stats.com for %s : %s" % (targetted_player.cid, text))
+            elif cmd.big:
+                self.console.write(('admin.yell', "bf3stats.com for %s : %s" % (targetted_player.cid, text), 10, 'all'))
+            else:
+                self.console.write(('admin.say', text, 'player', client.cid))
+                self.console.write(('admin.yell', text, 10, 'player', client.cid))
+            if stats.data_age > self.age_triggering_player_update:
+                client.message("stats are more than %s old, requesting update..." % minutesStr("%ss" % self.age_triggering_player_update))
+                t = Bf3stats_player_update(bf3stats_api=self.bf3stats_api, player_name=targetted_player.name,
+                    callback=self.callback_player_update,
+                    callback_kwargs={'client': client, 'targetted_player': targetted_player, 'cmd': cmd})
+                t.start()
