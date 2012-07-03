@@ -17,14 +17,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 __author__  = 'Courgette'
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 
 from b3 import __version__ as b3_version
-from distutils.version import LooseVersion
+from b3.update import B3version
 
 B3_VERSION_REQUIRED = '1.8.2dev2'
-assert LooseVersion(b3_version) >= LooseVersion(
+assert B3version(b3_version) >= B3version(
     B3_VERSION_REQUIRED), "The Bf3stats plugin requires B3 v%s or later. You current version is %s" % (B3_VERSION_REQUIRED, b3_version)
 
 from plugin import Bf3StatsPlugin as Plugin

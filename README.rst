@@ -90,3 +90,6 @@ Changelog
 1.1.1
   - Do not duplicate requests for a same player made multiple times waiting for the update result
   - Cosmetic changes to the way results are displayed
+
+1.1.2
+  - Fixes bug preventing the plugin to load with B3 1.8.2
