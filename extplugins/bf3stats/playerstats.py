@@ -81,9 +81,14 @@ class PlayerStats(object):
         return round(1.0 * self.data.Stats.Global.nemesiskills / self.data.Stats.Global.kills * 100, 2)
 
     @property
+    def headshotsperkillratio(self):
+        """ headshots / kills ratio"""
+        return round(1.0 * self.data.Stats.Global.headshots / self.data.Stats.Global.kills, 2)
+
+    @property
     def scoreperminute(self):
         """ global score / minutes of game played """
         return int(round(1.0 * self.data.Stats.Scores.score / self.data.Stats.Global.time * 60))
 
     def __str__(self):
-        return "skill:%s | Sc/min:%s | W/L:%s | K/D:%s | Acc:%s%% | Nemesis:%s%%" % (self.skill, self.scoreperminute, self.winlossratio, self.killdeathratio, self.accuracy, self.nemesiskillspct)
+        return "skill:%s | Sc/min:%s | W/L:%s | K/D:%s | Acc:%s%% | H/K:%s" % (self.skill, self.scoreperminute, self.winlossratio, self.killdeathratio, self.accuracy, self.headshotsperkillratio)

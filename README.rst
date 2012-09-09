@@ -93,3 +93,6 @@ Changelog
 
 1.1.2
   - Fixes bug preventing the plugin to load with B3 1.8.2
+
+1.2
+  - Stats display the Headshots per kill ratio (H/K) instead of Nemesis percentage

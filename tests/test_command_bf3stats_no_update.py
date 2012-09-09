@@ -50,8 +50,8 @@ bf3stats: 0
         self.joe.connects('joe')
         self.joe.says("!bf3stats")
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
-                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%', 10, 'player', 'joe'))])
+                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
+        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
 
     def test_nominal_with_argument(self):
         self.joe.connects('joe')
@@ -59,8 +59,8 @@ bf3stats: 0
         self.admin.says("!bf3stats joe")
         self.assertEqual([], self.admin.message_history)
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
-                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%', 10, 'player', 'admin'))])
+                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
+        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'admin'))])
 
     def test_with_argument_inexistant_player(self):
         self.admin.connects('admin')
@@ -71,26 +71,26 @@ bf3stats: 0
         self.joe.connects('joe')
         self.joe.says("@bf3stats")
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
-                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%', 10, 'player', 'joe'))])
+                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
+        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
 
     def test_big_no_privilege(self):
         self.joe.connects('joe')
         self.joe.says("&bf3stats")
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
-                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%', 10, 'player', 'joe'))])
+                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
+        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
 
     def test_loud(self):
         self.admin.connects('admin')
         self.admin.says("@bf3stats")
         self.say_mock.assert_has_calls([call('bf3stats.com for Level-40-Admin : (upd 5hr ago)'),
-                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%')])
+                                        call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
 
     def test_big(self):
         self.admin.connects('admin')
         self.admin.says("&bf3stats")
-        self.write_mock.assert_has_calls([call(('admin.yell', 'bf3stats.com for Level-40-Admin : skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%', 10, 'all'))])
+        self.write_mock.assert_has_calls([call(('admin.yell', 'bf3stats.com for Level-40-Admin : skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'all'))])
 
 
 

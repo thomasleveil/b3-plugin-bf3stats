@@ -41,7 +41,7 @@ class Test_PlayerStats(unittest.TestCase):
     def test_str(self):
         with patch("urllib.urlopen", new=urlopen_nominal_mock):
             ps = PlayerStats(API(), 'someone')
-            self.assertEqual('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | Nemesis:1.3%', str(ps))
+            self.assertEqual('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', str(ps))
 
 
     def test_non_existing_player(self):
