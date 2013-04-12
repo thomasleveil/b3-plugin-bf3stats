@@ -70,12 +70,12 @@ Contrib
 -------
 
 - *features* can be discussed on the `B3 forums <http://bit.ly/HUCyw3>`_
-- documented and reproducible *bugs* can be reported on the `issue tracker <https://github.com/courgette/b3-plugin-bf3stats/issues>`_
+- documented and reproducible *bugs* can be reported on the `issue tracker <https://github.com/thomasleveil/b3-plugin-bf3stats/issues>`_
 - *patches* are welcome. Send me a `pull request <http://help.github.com/send-pull-requests/>`_. It is best if your patch provides tests.
 
-.. image:: https://secure.travis-ci.org/courgette/b3-plugin-bf3stats.png?branch=master
+.. image:: https://secure.travis-ci.org/thomasleveil/b3-plugin-bf3stats.png?branch=master
    :alt: Build Status
-   :target: http://travis-ci.org/courgette/b3-plugin-bf3stats
+   :target: http://travis-ci.org/thomasleveil/b3-plugin-bf3stats
 
 
 Changelog
