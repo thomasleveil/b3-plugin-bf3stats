@@ -9,7 +9,7 @@ This plugin provides a command which can query the `bf3stats.com <http://bf3stat
 
 Bf3stats.com service does only refresh players stats on request, either by searching a player on the `bf3stats.com <http://bf3stats.com>`_ website or using a `registered app key <http://bf3stats.com/site/api/apps>`_.
 
-If you go on `http://bf3stats.com/site/api/apps <http://bf3stats.com/site/api/apps>`_ and register your plugin in the *Register App* form, then you will be given a *ident*/*secret_key* pair that you can set in this plugin config file. This will allow the plugin to request updates for you.
+If you go on `http://bf3stats.com/site/api/apps <http://bf3stats.com/site/api/apps>`_ and register your plugin in the *Register App* form, then you will be given a *ident* / *secret_key* pair that you can set in this plugin config file. This will allow the plugin to request updates for you.
 
 
 .. image:: http://i.imgur.com/XcvyI.png
@@ -56,7 +56,7 @@ Support is only provided on www.bigbrotherbot.net forums on the following topic 
 Credit
 ------
 
-This plugin has been make possible thanks to :
+This plugin has been made possible thanks to :
 
 - `Ozon's work <https://github.com/ozon/python-bf3stats>`_
 - `P-STATS.com <http://p-stats.com/>`_
