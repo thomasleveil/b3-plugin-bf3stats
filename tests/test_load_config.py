@@ -1,6 +1,9 @@
-import os, sys
+import os
+import sys
+
 from bf3stats import Bf3StatsPlugin
 from tests import Bf3TestCase
+
 
 if sys.version_info[:2] < (2, 7):
     import unittest2 as unittest
@@ -8,6 +11,7 @@ else:
     import unittest
 
 from b3.config import CfgConfigParser
+
 
 class Test_default_config(unittest.TestCase):
     def setUp(self):
@@ -58,6 +62,7 @@ minimum_level_to_update_stats: -1""")
 minimum_level_to_update_stats: 130""")
         self.p._load_config_preferences()
         self.assertEqual(128, self.p.minimum_level_to_update_stats)
+
 
 class Test_bf3stats_com(Bf3TestCase):
     def setUp(self):

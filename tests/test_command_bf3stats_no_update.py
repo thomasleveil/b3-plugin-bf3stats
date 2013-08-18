@@ -1,9 +1,12 @@
-from mock import patch, Mock, call
 import time
+from StringIO import StringIO
+
+from mock import patch, Mock, call
+
 from b3.config import CfgConfigParser
 from bf3stats import Bf3StatsPlugin
-from StringIO import StringIO
 from tests import Bf3TestCase
+
 
 def provide_stats_feed(*args, **kwargs):
     return StringIO("""
@@ -30,6 +33,7 @@ def provide_stats_feed(*args, **kwargs):
             },"status":"data"
         }""" % {'date_updated': time.time() - (5 * 60 * 60)})
 
+
 urlopen_nominal_mock = Mock(wraps=provide_stats_feed)
 
 
@@ -51,7 +55,8 @@ bf3stats: 0
         self.joe.says("!bf3stats")
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
                                         call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
+        self.write_mock.assert_has_calls([call((
+        'admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
 
     def test_nominal_with_argument(self):
         self.joe.connects('joe')
@@ -60,7 +65,8 @@ bf3stats: 0
         self.assertEqual([], self.admin.message_history)
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
                                         call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'admin'))])
+        self.write_mock.assert_has_calls([call((
+        'admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'admin'))])
 
     def test_with_argument_inexistant_player(self):
         self.admin.connects('admin')
@@ -72,14 +78,16 @@ bf3stats: 0
         self.joe.says("@bf3stats")
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
                                         call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
+        self.write_mock.assert_has_calls([call((
+        'admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
 
     def test_big_no_privilege(self):
         self.joe.connects('joe')
         self.joe.says("&bf3stats")
         self.say_mock.assert_has_calls([call('bf3stats.com for Joe : (upd 5hr ago)'),
                                         call('skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21')])
-        self.write_mock.assert_has_calls([call(('admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
+        self.write_mock.assert_has_calls([call((
+        'admin.yell', 'skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'player', 'joe'))])
 
     def test_loud(self):
         self.admin.connects('admin')
@@ -90,13 +98,17 @@ bf3stats: 0
     def test_big(self):
         self.admin.connects('admin')
         self.admin.says("&bf3stats")
-        self.write_mock.assert_has_calls([call(('admin.yell', 'bf3stats.com for Level-40-Admin : skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21', 10, 'all'))])
+        self.write_mock.assert_has_calls([call(('admin.yell',
+                                                'bf3stats.com for Level-40-Admin : skill:338.2 | Sc/min:227 | W/L:0.75 | K/D:1.07 | Acc:19.6% | H/K:0.21',
+                                                10, 'all'))])
 
 
+urlopen_not_found_mock = Mock(return_value=StringIO("""{"status":"notfound"}"""))
+urlopen_invalid_name_mock = Mock(
+    return_value=StringIO('{"status": "error", "reasons": ["too long"], "error": "invalid_name"}'))
+urlopen_pifound_mock = Mock(return_value=StringIO(
+    """{"status":  "pifound", "country_img": "flags/fr.png", "stats": null, "name": "diokless", "language": "fr", "country": "fr", "date_update": 1321788634, "plat": "pc", "country_name": "France", "date_insert": 1321788635}"""))
 
-urlopen_not_found_mock = Mock(return_value = StringIO("""{"status":"notfound"}"""))
-urlopen_invalid_name_mock = Mock(return_value = StringIO('{"status": "error", "reasons": ["too long"], "error": "invalid_name"}'))
-urlopen_pifound_mock = Mock(return_value = StringIO("""{"status":  "pifound", "country_img": "flags/fr.png", "stats": null, "name": "diokless", "language": "fr", "country": "fr", "date_update": 1321788634, "plat": "pc", "country_name": "France", "date_insert": 1321788635}"""))
 
 class Test_other_statuses(Bf3TestCase):
     def setUp(self):
@@ -120,7 +132,8 @@ bf3stats: 0
     def test_invalid_name(self):
         self.joe.connects('Joe')
         self.joe.says("!bf3stats")
-        self.assertEqual(["Error while querying bf3stats.com. Error while querying 'Joe' : invalid_name"], self.joe.message_history)
+        self.assertEqual(["Error while querying bf3stats.com. Error while querying 'Joe' : invalid_name"],
+                         self.joe.message_history)
 
     @patch("urllib.urlopen", new=urlopen_pifound_mock)
     def test_pifound(self):

@@ -42,9 +42,9 @@ class Bf3stats_player_update_service(object):
         with self.__lock:
             if not player_name in self.__running_tasks:
                 self.__running_tasks[player_name] = {}
-                Bf3stats_player_update(self.__bf3stats_api, player_name, callback=self.on_task_done, callback_args=(player_name,)).start()
+                Bf3stats_player_update(self.__bf3stats_api, player_name, callback=self.on_task_done,
+                                       callback_args=(player_name,)).start()
             self.__running_tasks[player_name][id(client)] = (callback, callback_args)
-
 
 
 class Bf3stats_player_update(Thread):

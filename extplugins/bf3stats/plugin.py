@@ -1,7 +1,7 @@
 #
 # Bf3stats for BigBrotherBot(B3) (www.bigbrotherbot.net)
 # Copyright (C) 2012 courgette@bigbrotherbot.net
-# 
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -11,14 +11,14 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 import ConfigParser
 import time
-from b3.plugin import  Plugin
+from b3.plugin import Plugin
 from b3.functions import minutesStr
 from bf3stats.api import API
 from bf3stats.playerstats import PlayerStats, Bf3statsError, NoStat
@@ -133,11 +133,11 @@ class Bf3StatsPlugin(Plugin):
     def _load_config_bf3stats(self):
         try:
             ident = self.config.get("bf3stats.com", "ident")
-        except ConfigParser.NoOptionError, err:
+        except ConfigParser.NoOptionError:
             ident = None
         try:
             secret_key = self.config.get("bf3stats.com", "secret_key")
-        except ConfigParser.NoOptionError, err:
+        except ConfigParser.NoOptionError:
             secret_key = None
         if ident and secret_key:
             self.info(
@@ -189,14 +189,19 @@ class Bf3StatsPlugin(Plugin):
 
     def __send_bf3stats_response(self, client, targetted_player, cmd, stats):
         def short_minuteStr(text):
-            return minutesStr(text).replace(" seconds", "s").replace(" second", "s").replace(" minutes", "min").replace(" minute", "min").replace(" hours", "hr").replace(" hour", "hr")
+            return minutesStr(text).replace(" seconds", "s").replace(" second", "s").replace(" minutes", "min").replace(
+                " minute", "min").replace(" hours", "hr").replace(" hour", "hr")
+
         if cmd.loud or cmd.big:
-            self.console.say("bf3stats.com for %s : (upd %s ago)" % (targetted_player.name,  short_minuteStr("%ss" % stats.data_age)))
+            self.console.say(
+                "bf3stats.com for %s : (upd %s ago)" % (targetted_player.name, short_minuteStr("%ss" % stats.data_age)))
             self.console.say(str(stats))
             if cmd.big:
-                self.console.write(('admin.yell', "bf3stats.com for %s : %s" % (targetted_player.name, stats), 10, 'all'))
+                self.console.write(
+                    ('admin.yell', "bf3stats.com for %s : %s" % (targetted_player.name, stats), 10, 'all'))
         else:
-            self.console.say("bf3stats.com for %s : (upd %s ago)" % (targetted_player.name,  short_minuteStr("%ss" % stats.data_age)))
+            self.console.say(
+                "bf3stats.com for %s : (upd %s ago)" % (targetted_player.name, short_minuteStr("%ss" % stats.data_age)))
             self.console.say(str(stats))
             self.console.write(('admin.yell', str(stats), 10, 'player', client.cid))
 
@@ -216,7 +221,8 @@ class Bf3StatsPlugin(Plugin):
         except NoStat:
             client.message("bf3stats.com has no stats for %s, requesting update..." % targetted_player.name)
             self.update_service.request_update(player_name=targetted_player.name, client=client,
-                callback=self.callback_player_update, callback_args=(client, targetted_player, cmd))
+                                               callback=self.callback_player_update,
+                                               callback_args=(client, targetted_player, cmd))
         except Bf3statsError, err:
             client.message("Error while querying bf3stats.com. %s" % err)
         else:
@@ -225,4 +231,5 @@ class Bf3StatsPlugin(Plugin):
                 client.message("stats are more than %s old, requesting update..." % minutesStr(
                     "%ss" % self.age_triggering_player_update))
                 self.update_service.request_update(player_name=targetted_player.name, client=client,
-                    callback=self.callback_player_update, callback_args=(client, targetted_player, cmd))
+                                                   callback=self.callback_player_update,
+                                                   callback_args=(client, targetted_player, cmd))

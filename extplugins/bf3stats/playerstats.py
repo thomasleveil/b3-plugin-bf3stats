@@ -1,31 +1,33 @@
 import time
-from bf3stats.api import API
+
 
 class Bf3statsError(Exception):
     def __init__(self, name, data):
         Exception.__init__(self, name)
         self.data = data
 
+
 class NoStat(Bf3statsError):
     def __init__(self, playername, data):
         Bf3statsError.__init__(self, "Player '%s' found but has no stats" % playername, data)
+
 
 class NotFound(Bf3statsError):
     def __init__(self, playername, data):
         Bf3statsError.__init__(self, "Player '%s' not found" % playername, data)
 
+
 class InvalidName(Bf3statsError):
     def __init__(self, playername, data):
         Bf3statsError.__init__(self, "Invalid name '%s'" % playername, data)
+
 
 class Error(Bf3statsError):
     def __init__(self, playername, data):
         Bf3statsError.__init__(self, "Error while querying '%s' : %s" % (playername, data.error), data)
 
 
-
 class PlayerStats(object):
-
     def __init__(self, bf3stats_api, playername):
         bf3stats_service = bf3stats_api
         data = bf3stats_service.player(playername, 'clear,global,scores,rank')
@@ -64,7 +66,7 @@ class PlayerStats(object):
     def accuracy(self):
         """ accuracy % """
         return round(1.0 * self.data.Stats.Global.hits / self.data.Stats.Global.shots * 100, 1)
-    
+
     @property
     def winlossratio(self):
         """ Wins / Losses ratio """
@@ -91,4 +93,6 @@ class PlayerStats(object):
         return int(round(1.0 * self.data.Stats.Scores.score / self.data.Stats.Global.time * 60))
 
     def __str__(self):
-        return "skill:%s | Sc/min:%s | W/L:%s | K/D:%s | Acc:%s%% | H/K:%s" % (self.skill, self.scoreperminute, self.winlossratio, self.killdeathratio, self.accuracy, self.headshotsperkillratio)
+        return "skill:%s | Sc/min:%s | W/L:%s | K/D:%s | Acc:%s%% | H/K:%s" % (
+        self.skill, self.scoreperminute, self.winlossratio, self.killdeathratio, self.accuracy,
+        self.headshotsperkillratio)

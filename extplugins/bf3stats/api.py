@@ -40,7 +40,7 @@ class API(object):
             self._base_url = 'http://api.bf3stats.com'
         else:
             self._base_url = base_url
-        # can be pc, 360 or ps3
+            # can be pc, 360 or ps3
         self._plattform = plattform
         # ident and secret for signed requests
         self._ident = ident
@@ -62,7 +62,7 @@ class API(object):
             con.close()
             raw_data = json.loads(result)
         except IOError, err:
-            raw_data = {'status' : 'error', 'error': err}
+            raw_data = {'status': 'error', 'error': err}
         return objDict(raw_data)
 
     def _sign(self, data_dict):
@@ -70,9 +70,9 @@ class API(object):
         assert self._can_do_signed_requests(), "You must provide an ident and secret_key to call this function. See http://bf3stats.com/api"
         data = base64.urlsafe_b64encode(json.dumps(data_dict)).rstrip('=')
         sig = base64.urlsafe_b64encode(
-                hmac.new(self._secret, msg=data, digestmod=hashlib.sha256).digest()
-                ).rstrip('=')
-        return { 'data': data, 'sig': sig }
+            hmac.new(self._secret, msg=data, digestmod=hashlib.sha256).digest()
+        ).rstrip('=')
+        return {'data': data, 'sig': sig}
 
     def _can_do_signed_requests(self):
         return self._ident and self._secret
@@ -87,18 +87,18 @@ class API(object):
     def player(self, player_name, parts=None):
         """Request a player"""
         post_data = {
-                'player' : player_name,
-                'opt' : parts
-                }
+            'player': player_name,
+            'opt': parts
+        }
         return self._request(post_data, data_group='player')
 
     def dogtags(self, player_name):
         """Request Player dogtags"""
-        return self._request(post_data = {'player': player_name}, data_group='dogtags')
+        return self._request(post_data={'player': player_name}, data_group='dogtags')
 
     def onlinestats(self):
         """Count of online players"""
-        return  self._request(post_data={}, data_group='onlinestats', plattform='global')
+        return self._request(post_data={}, data_group='onlinestats', plattform='global')
 
 
     def playerupdate(self, player_name):
@@ -110,10 +110,10 @@ class API(object):
         Note: Clock should not have more than 1 minute difference to current time.
         """
         post_data = {
-                'ident': self._ident,
-                'time': int(time.time()),
-                'player': player_name
-                }
+            'ident': self._ident,
+            'time': int(time.time()),
+            'player': player_name
+        }
         return self._request(post_data, data_group='playerupdate', sign=True)
 
     def playerlookup(self, player_name):
@@ -128,20 +128,20 @@ class API(object):
     def setupkey(self, client_ident=None, name=None):
         """Generate an individual client key for every installation"""
         post_data = {
-                'ident': self._ident,
-                'time': int(time.time()),
-                'clientident': client_ident,
-                'name': name
-                }
+            'ident': self._ident,
+            'time': int(time.time()),
+            'clientident': client_ident,
+            'name': name
+        }
         return self._request(post_data, data_group='setupkey', plattform='global', sign=True)
 
     def getkey(self, client_ident):
         """"Get information about a existing client key or your own key."""
         post_data = {
-                'ident': self._ident,
-                'time': int(time.time()),
-                'clientident': client_ident,
-                }
+            'ident': self._ident,
+            'time': int(time.time()),
+            'clientident': client_ident,
+        }
         return self._request(post_data, data_group='getkey', plattform='global', sign=True)
 
 

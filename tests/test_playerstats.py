@@ -10,7 +10,7 @@ from mock import patch, Mock
 from bf3stats.playerstats import PlayerStats, NotFound, Bf3statsError
 from StringIO import StringIO
 
-urlopen_nominal_mock = Mock(return_value = StringIO("""
+urlopen_nominal_mock = Mock(return_value=StringIO("""
         {
             "plat":"pc","name":"someone","language":"fr","country":"fr","country_name":"France","date_insert":1320347509,"date_update":1320347509,
             "stats":{
@@ -34,10 +34,10 @@ urlopen_nominal_mock = Mock(return_value = StringIO("""
             },"status":"data"
         }"""))
 
-urlopen_not_found_mock = Mock(return_value = StringIO("""{"status":"notfound"}"""))
+urlopen_not_found_mock = Mock(return_value=StringIO("""{"status":"notfound"}"""))
+
 
 class Test_PlayerStats(unittest.TestCase):
-
     def test_str(self):
         with patch("urllib.urlopen", new=urlopen_nominal_mock):
             ps = PlayerStats(API(), 'someone')

@@ -49,15 +49,18 @@ class Bf3TestCase(unittest.TestCase):
         with logging_disabled():
             from b3.parsers.frostbite2.abstractParser import AbstractParser
             from b3.fake import FakeConsole
+
             AbstractParser.__bases__ = (FakeConsole,)
             # Now parser inheritance hierarchy is :
             # Bf3Parser -> AbstractParser -> FakeConsole -> Parser
 
             # add method changes_team(newTeam, newSquad=None) to FakeClient
             def changes_team(self, newTeam, newSquad=None):
-                self.console.OnPlayerTeamchange(data=[self.cid, newTeam, newSquad if newSquad else self.squad], action=None)
+                self.console.OnPlayerTeamchange(data=[self.cid, newTeam, newSquad if newSquad else self.squad],
+                                                action=None)
 
             from b3.fake import FakeClient
+
             FakeClient.changes_team = changes_team
 
     def setUp(self):
@@ -84,12 +87,19 @@ class Bf3TestCase(unittest.TestCase):
 
         # prepare a few players
         from b3.fake import FakeClient
-        self.joe = FakeClient(self.console, name="Joe", exactName="Joe", guid="zaerezarezar", groupBits=1, team=TEAM_UNKNOWN, teamId=0, squad=0)
-        self.simon = FakeClient(self.console, name="Simon", exactName="Simon", guid="qsdfdsqfdsqf", groupBits=0, team=TEAM_UNKNOWN, teamId=0, squad=0)
-        self.reg = FakeClient(self.console, name="Reg", exactName="Reg", guid="qsdfdsqfdsqf33", groupBits=4, team=TEAM_UNKNOWN, teamId=0, squad=0)
-        self.moderator = FakeClient(self.console, name="Moderator", exactName="Moderator", guid="sdf455ezr", groupBits=8, team=TEAM_UNKNOWN, teamId=0, squad=0)
-        self.admin = FakeClient(self.console, name="Level-40-Admin", exactName="Level-40-Admin", guid="875sasda", groupBits=16, team=TEAM_UNKNOWN, teamId=0, squad=0)
-        self.superadmin = FakeClient(self.console, name="God", exactName="God", guid="f4qfer654r", groupBits=128, team=TEAM_UNKNOWN, teamId=0, squad=0)
+
+        self.joe = FakeClient(self.console, name="Joe", exactName="Joe", guid="zaerezarezar", groupBits=1,
+                              team=TEAM_UNKNOWN, teamId=0, squad=0)
+        self.simon = FakeClient(self.console, name="Simon", exactName="Simon", guid="qsdfdsqfdsqf", groupBits=0,
+                                team=TEAM_UNKNOWN, teamId=0, squad=0)
+        self.reg = FakeClient(self.console, name="Reg", exactName="Reg", guid="qsdfdsqfdsqf33", groupBits=4,
+                              team=TEAM_UNKNOWN, teamId=0, squad=0)
+        self.moderator = FakeClient(self.console, name="Moderator", exactName="Moderator", guid="sdf455ezr",
+                                    groupBits=8, team=TEAM_UNKNOWN, teamId=0, squad=0)
+        self.admin = FakeClient(self.console, name="Level-40-Admin", exactName="Level-40-Admin", guid="875sasda",
+                                groupBits=16, team=TEAM_UNKNOWN, teamId=0, squad=0)
+        self.superadmin = FakeClient(self.console, name="God", exactName="God", guid="f4qfer654r", groupBits=128,
+                                     team=TEAM_UNKNOWN, teamId=0, squad=0)
 
         # a few mocks
         self.say_patcher = patch.object(self.console, 'say')
