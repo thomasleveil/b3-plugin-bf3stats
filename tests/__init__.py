@@ -5,12 +5,38 @@ if sys.version_info[:2] < (2, 7):
 else:
     import unittest
 import logging
+from mockito import when
 from mock import patch
+from b3.update import B3version
 from b3 import TEAM_UNKNOWN
 from b3.config import XmlConfigParser
-from b3.fake import FakeClient
 from b3.parsers.bf3 import Bf3Parser
 from b3.plugins.admin import AdminPlugin
+from b3 import __version__ as b3_version
+
+
+class logging_disabled(object):
+    """
+    context manager that temporarily disable logging.
+
+    USAGE:
+        with logging_disabled():
+            # do stuff
+    """
+    DISABLED = False
+
+    def __init__(self):
+        self.nested = logging_disabled.DISABLED
+
+    def __enter__(self):
+        if not self.nested:
+            logging.getLogger('output').propagate = False
+            logging_disabled.DISABLED = True
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not self.nested:
+            logging.getLogger('output').propagate = True
+            logging_disabled.DISABLED = False
 
 
 class Bf3TestCase(unittest.TestCase):
@@ -20,19 +46,19 @@ class Bf3TestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # less logging
-        logging.getLogger('output').setLevel(logging.ERROR)
+        with logging_disabled():
+            from b3.parsers.frostbite2.abstractParser import AbstractParser
+            from b3.fake import FakeConsole
+            AbstractParser.__bases__ = (FakeConsole,)
+            # Now parser inheritance hierarchy is :
+            # Bf3Parser -> AbstractParser -> FakeConsole -> Parser
 
-        from b3.parsers.frostbite2.abstractParser import AbstractParser
-        from b3.fake import FakeConsole
-        AbstractParser.__bases__ = (FakeConsole,)
-        # Now parser inheritance hierarchy is :
-        # Bf3Parser -> AbstractParser -> FakeConsole -> Parser
+            # add method changes_team(newTeam, newSquad=None) to FakeClient
+            def changes_team(self, newTeam, newSquad=None):
+                self.console.OnPlayerTeamchange(data=[self.cid, newTeam, newSquad if newSquad else self.squad], action=None)
 
-        # add method changes_team(newTeam, newSquad=None) to FakeClient
-        def changes_team(self, newTeam, newSquad=None):
-            self.console.OnPlayerTeamchange(data=[self.cid, newTeam, newSquad if newSquad else self.squad], action=None)
-        FakeClient.changes_team = changes_team
+            from b3.fake import FakeClient
+            FakeClient.changes_team = changes_team
 
     def setUp(self):
         # create a BF3 parser
@@ -45,18 +71,19 @@ class Bf3TestCase(unittest.TestCase):
         self.console.startup()
 
         # load the admin plugin
-        self.adminPlugin = AdminPlugin(self.console, '@b3/conf/plugin_admin.xml')
-        self.adminPlugin.onStartup()
+        if B3version(b3_version) >= B3version("1.10dev"):
+            admin_plugin_conf_file = '@b3/conf/plugin_admin.ini'
+        else:
+            admin_plugin_conf_file = '@b3/conf/plugin_admin.xml'
+        with logging_disabled():
+            self.adminPlugin = AdminPlugin(self.console, admin_plugin_conf_file)
+            self.adminPlugin.onStartup()
 
         # make sure the admin plugin obtained by other plugins is our admin plugin
-        def getPlugin(name):
-            if name == 'admin':
-                return self.adminPlugin
-            else:
-                return self.console.getPlugin(name)
-        self.console.getPlugin = getPlugin
+        when(self.console).getPlugin('admin').thenReturn(self.adminPlugin)
 
         # prepare a few players
+        from b3.fake import FakeClient
         self.joe = FakeClient(self.console, name="Joe", exactName="Joe", guid="zaerezarezar", groupBits=1, team=TEAM_UNKNOWN, teamId=0, squad=0)
         self.simon = FakeClient(self.console, name="Simon", exactName="Simon", guid="qsdfdsqfdsqf", groupBits=0, team=TEAM_UNKNOWN, teamId=0, squad=0)
         self.reg = FakeClient(self.console, name="Reg", exactName="Reg", guid="qsdfdsqfdsqf33", groupBits=4, team=TEAM_UNKNOWN, teamId=0, squad=0)
